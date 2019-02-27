@@ -12,4 +12,15 @@
 		<servlet-name>TestController</servlet-name>
 		<url-pattern>/test</url-pattern>
 	</servlet-mapping>
+	
+		<servlet>
+		<servlet-name>ColorClickController</servlet-name>
+		<servlet-class>com.memory.color.game.controller.ColorClickController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ColorClickController</servlet-name>
+		<url-pattern>/testclick</url-pattern>
+	</servlet-mapping>
+	
+	
 </web-app>
