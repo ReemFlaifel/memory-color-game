@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.memory.color.game.service.ColorGameService;
+
 public class ColorDealer {
 
 	public List<String> generateColorList(int level) {
@@ -20,4 +22,16 @@ public class ColorDealer {
 		Random random = new Random();
 		return colors.get(random.nextInt(colors.size() - 1));
 	}
+
+	public String generateNewColor(int level) {
+		if (level == 2) {
+			return "orange";
+		} else if (level == 3) {
+			return "pink";
+		} else if (level == 4) {
+			return "white";
+		}
+		return null;
+	}
+
 }

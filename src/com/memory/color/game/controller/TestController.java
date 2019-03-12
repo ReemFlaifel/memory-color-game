@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.memory.color.game.model.ColorDealer;
+import com.memory.color.game.model.Player;
 
 public class TestController extends HttpServlet {
 
@@ -18,37 +19,33 @@ public class TestController extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.getWriter().append("Hi bata ");
 		HttpSession session = req.getSession();
-		if (session.isNew()) {
-			session.setAttribute("level", 1);
-			session.setAttribute("clicks", 1);
+		Player player = (Player) session.getAttribute("player");
+		if (player == null) {
+			player = createPlayer();
 		} else {
-			session.setAttribute("clicks", ((int) session.getAttribute("clicks")) + 1);
+			player.setClicks(player.getClicks() + 1);
 		}
-		
 		ColorDealer dealer = new ColorDealer();
 
-		List<String> dealedColors = (List<String>) session.getAttribute("dealedColors");
+		List<String> colors = player.getDealedColors();
+		colors.add(dealer.dealColor(player.getLevel()));
+		player.setDealedColors(colors);
 
-		if (dealedColors == null || dealedColors.isEmpty()) {
-			dealedColors = new ArrayList<String>();
-			session.setAttribute("dealedColors", dealedColors);
-		}
-		dealedColors.add(dealer.dealColor((int) session.getAttribute("level")));
+		session.setAttribute("player", player);
 
-		if ((int) (session.getAttribute("clicks")) > 5) {
-			session.setAttribute("level", ((int) session.getAttribute("level")) + 1);
-			session.setAttribute("clicks", 1);
-		}
+		resp.getWriter().append(player.getAvailableColors().toString());
+		resp.getWriter().append(player.getDealedColors().toString());
 
-		List<String> generateColorList = (List) session.getAttribute("colorList");
-		if (generateColorList == null || generateColorList.isEmpty()) {
-			session.setAttribute("colorList", dealer.generateColorList((int) session.getAttribute("level")));
-		}
-
-		resp.getWriter().append(session.getAttribute("colorList").toString() + " ");
-		resp.getWriter().append(session.getAttribute("dealedColors").toString() + " ");
-
-		resp.getWriter().append(session.getAttribute("level").toString() + " ");
-		resp.getWriter().append(session.getAttribute("clicks").toString());
+		resp.getWriter().append(player.getLevel() + " ");
+		resp.getWriter().append(player.getClicks() + " ");
 	}
+
+	private Player createPlayer() {
+
+		Player newPlayer = new Player(0, 1, 1);
+		newPlayer.setDealedColors(new ArrayList<String>());
+		newPlayer.setAvailableColors(new ColorDealer().generateColorList(newPlayer.getLevel()));
+		return newPlayer;
+	}
+
 }

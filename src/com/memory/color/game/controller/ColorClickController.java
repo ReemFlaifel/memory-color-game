@@ -11,20 +11,36 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.websocket.Session;
 
+import com.memory.color.game.model.ColorDealer;
+import com.memory.color.game.model.Player;
+import com.memory.color.game.service.ColorGameService;
+
 public class ColorClickController extends HttpServlet {
+	ColorGameService gameService = new ColorGameService();
+	ColorDealer dealer = new ColorDealer();
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String clickedColor = (String) req.getParameter("clickedcolor");
 		HttpSession session = req.getSession();
-		List<String> colors = (List) session.getAttribute("colorList");
-		int clicks = (int) session.getAttribute("colorList");
+		Player player = (Player) session.getAttribute("player");
+		String clickedColor = (String) req.getParameter("clickedcolor");
 
-		if (!colors.get(clicks).equals(clickedColor)) {
-			resp.getWriter().println("Falied");
+		try {
+			if (player.getClicks() == player.getDealedColors().size()) {
+				gameService.updatePlayerColorList(player);
+			}
+			gameService.playTurn(player, clickedColor);
+
+		} catch (Exception e) {
+			System.err.println(e);
 		}
-		else {
-			resp.getWriter().println("sucess");
+
+		if (gameService.levelUp(player)) {
+			resp.getWriter().write("Next Level");
 		}
+
+		resp.getWriter().write(player.getDealedColors().toString());
+		resp.getWriter().write(player.getClicks());
 
 	}
 }
